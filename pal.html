@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palworld Server Status</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0c10;
+            font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #f5f5f7;
+            overflow-x: hidden; 
+        }
+
+        .parallax-bg {
+            position: fixed;
+            top: -2.5%; 
+            left: -2.5%;
+            width: 105%;
+            height: 105%;
+            background-color: #0b0c10; /* 移除了背景图片路径 */
+            z-index: -1; 
+            will-change: transform; 
+        }
+
+        .page {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative; 
+        }
+
+        @keyframes textGlitchIn {
+            0% { opacity: 0; transform: translateY(20px) skewX(10deg); filter: hue-rotate(90deg); }
+            50% { opacity: 0.8; transform: translateY(-5px) skewX(-5deg); filter: hue-rotate(-90deg); }
+            100% { opacity: 1; transform: translateY(0) skewX(0); filter: hue-rotate(0); }
+        }
+
+        h1.cyber-title {
+            font-weight: 700;
+            font-size: clamp(3rem, 6vw, 4.5rem); 
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #0ff, #fff, #f0f, #fff, #0ff);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 2px 2px 0px rgba(0, 255, 255, 0.5), -2px -2px 0px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
+            animation: gradientShift 4s linear infinite, textGlitchIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes gradientShift { to { background-position: 200% center; } }
+
+        .subtitle {
+            font-size: 1.6rem;
+            color: #b0c4de;
+            letter-spacing: 4px;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+            opacity: 0; 
+            animation: fadeIn 1s ease-out 0.5s forwards; 
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .scroll-arrow {
+            position: absolute;
+            bottom: 40px;
+            font-size: 2rem;
+            color: #0ff;
+            text-decoration: none;
+            text-shadow: 0 0 10px #0ff;
+            animation: bounceArrow 2s infinite, fadeIn 1s ease-out 1s backwards;
+        }
+
+        @keyframes bounceArrow {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
+            40% { transform: translateY(-15px); opacity: 1; text-shadow: 0 0 20px #0ff, 0 0 30px #fff; }
+            60% { transform: translateY(-7px); }
+        }
+
+        .content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: clamp(100px, 15vw, 400px); 
+            padding: 20px;
+            max-width: 1200px;
+        }
+
+        h2.cyber-h2 {
+            font-size: 2.8rem; 
+            margin-bottom: 2.5rem; 
+            text-align: center; 
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            text-shadow: 2px 0 0 #0ff, -2px 0 0 #f0f;
+        }
+
+        .card-container { display: flex; flex-direction: column; gap: 40px; }
+
+        .flip-card { width: 300px; height: 140px; perspective: 800px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg) rotateX(5deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 600; font-size: 1.5rem; letter-spacing: 2px; }
+        .flip-card-front { background: rgba(20, 25, 35, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #f0f; box-shadow: 0 10px 20px rgba(0,0,0,0.5); color: #eaeaea; }
+        @keyframes pulseNeon { 0%, 100% { text-shadow: 0 0 5px #0ff, 0 0 10px #0ff; } 50% { text-shadow: 0 0 15px #0ff, 0 0 25px #0ff, 0 0 35px #fff; } }
+        .flip-card-back { background: #0a0e17; transform: rotateY(180deg); border: 1px solid #0ff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) inset; color: #0ff; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; font-weight: 700; padding: 0 10px; animation: pulseNeon 2s infinite; }
+
+        @media (max-width: 768px) {
+            .content-wrapper { flex-direction: column; gap: 50px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="parallax-bg" id="parallax-bg"></div>
+
+    <div class="page" id="home">
+        <h1 class="cyber-title">Palworld 联机服务器</h1>
+        <div class="subtitle">SERVER ACCESS // 连接节点</div>
+        <a href="#server-info" class="scroll-arrow">↓</a>
+    </div>
+
+    <div class="page" id="server-info">
+        <div class="content-wrapper">
+            <div class="text-side">
+                <h2 class="cyber-h2">服务器连接地址</h2>
+                <div class="card-container">
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">济南联通 [NODE_01]</div>
+                            <div class="flip-card-back">frp-boy.com:59372</div>
+                        </div>
+                    </div>
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">天津联通 [NODE_02]</div>
+                            <div class="flip-card-back">frp-act.com:24406</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
